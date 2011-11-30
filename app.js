@@ -10,10 +10,18 @@ var express = require('express')
 mongoose.connect('mongodb://localhost:27017/todo');
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
+
+function validatePresenceOf(value) {
+  return value && value.length;
+}
+
 var Task = new Schema({
-  task      : String
+  task : { type: String, validate: [validatePresenceOf, 'a task is required'] },
+  created_at : Date,
+  updated_at : Date
 });
 var Task = mongoose.model('Task', Task);
+
 
 
 var app = module.exports = express.createServer();
@@ -45,8 +53,7 @@ app.get('/', routes.index);
 
 app.get('/tasks', function(req, res){
   Task.find({}, function (err, docs) {
-    res.render('tasks/index.jade', 
-      { 
+    res.render('tasks/index.jade', { 
         title: 'My Site',
         docs: docs,
         flash: req.flash()
@@ -54,35 +61,52 @@ app.get('/tasks', function(req, res){
   });
 });
 
-// CREATE
+// Create
+app.get('/tasks/new', function(req, res){
+  res.render('tasks/new.jade', { 
+    title: 'My Site',
+    flash: req.flash()
+  });
+});
+
 app.post('/tasks', function(req, res){
   var task = new Task(req.body.task);
+  task.created_at = new Date();
   task.save(function (err) {
-    req.flash('info', 'Task created');
-    res.redirect('/tasks');
+    if (!err) {
+      req.flash('info', 'Task created');
+      res.redirect('/tasks');
+    }
+    else {
+      req.flash('warning', err);
+      res.redirect('/tasks/new');
+    }
   });
 });
-// READ
-app.post('/tasks/:id', function(req, res){
-});
-app.get('/tasks/new', function(req, res){
-  res.render('tasks/new.jade', { title: 'My Site' });
-});
-// SHOW
+
+// Read
 app.get('/tasks/:id', function(req, res){
   Task.findById(req.params.id, function (err, doc){
-    res.render('tasks/show.jade', { title: 'My Site', task: doc });
+    res.render('tasks/show.jade', { 
+      title: 'My Site', 
+      task: doc 
+    });
   });
 });
-// EDIT
+
+// Update
 app.get('/tasks/:id/edit', function(req, res){
   Task.findById(req.params.id, function (err, doc){
-    res.render('tasks/edit.jade', { title: 'My Site', task: doc });
+    res.render('tasks/edit.jade', { 
+      title: 'My Site', 
+      task: doc 
+    });
   });
 });
-// UPDATE
+
 app.put('/tasks/:id', function(req, res){
   Task.findById(req.params.id, function (err, doc){
+    doc.updated_at = new Date();
     doc.task = req.body.task.task;
     doc.save(function(err) {
       if (!err){
@@ -95,11 +119,11 @@ app.put('/tasks/:id', function(req, res){
     });
   });
 });
-// DELETE
+
+// Delete
 app.del('/tasks/:id', function(req, res){
   Task.findOne({ _id: req.params.id }, function(err, doc) {
     if (!doc) return next(new NotFound('Document not found'));
-
     doc.remove(function() {
       req.flash('info', 'Task deleted');
       res.redirect('/tasks');
