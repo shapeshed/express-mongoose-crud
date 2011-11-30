@@ -1,4 +1,15 @@
 h1 New view
+
+-if(typeof flash != 'undefined')
+  - if(flash.warning)
+    div(data-alert='alert').alert-message.warning.fade.in
+      a(class="close", href="#")×
+      p= flash.warning
+  - if(flash.info)
+    div(data-alert='alert').alert-message.success.fade.in
+      a(class="close", href="#")×
+      p= flash.info
+
 form(method='post', action='/tasks')
   fieldset
     legend Add a task
