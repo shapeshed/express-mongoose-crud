@@ -1,0 +1,28 @@
+h1 Index
+ul
+  li
+    a(href='/tasks/new') New
+
+-if(typeof flash != 'undefined')
+  - if(flash.error)
+    span.error= flash.error
+  - if(flash.info)
+    span.info= flash.info
+    div.alert-message.success
+      a(class="close", href="#")×
+      p= flash.info
+
+table
+  tr
+    th Task
+    th 
+    th 
+    each task in docs
+      tr
+        td
+          a(href="/tasks/#{task.id}") 
+            #{task.task}
+        td
+          a(href="/tasks/#{task.id}/edit") Edit
+        td
+          a(href="/tasks/#{task.id}") Delete
