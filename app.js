@@ -97,7 +97,14 @@ app.put('/tasks/:id', function(req, res){
 });
 // DELETE
 app.del('/tasks/:id', function(req, res){
-    res.send(req.body);
+  Task.findOne({ _id: req.params.id }, function(err, doc) {
+    if (!doc) return next(new NotFound('Document not found'));
+
+    doc.remove(function() {
+      req.flash('info', 'Task deleted');
+      res.redirect('/tasks');
+    });
+  });
 });
 
 app.listen(3000);
