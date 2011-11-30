@@ -5,9 +5,10 @@ ul
 
 -if(typeof flash != 'undefined')
   - if(flash.error)
-    span.error= flash.error
+    div.alert-message.warning
+      a(class="close", href="#")×
+      p= flash.warning
   - if(flash.info)
-    span.info= flash.info
     div.alert-message.success
       a(class="close", href="#")×
       p= flash.info
@@ -25,4 +26,6 @@ table
         td
           a(href="/tasks/#{task.id}/edit") Edit
         td
-          a(href="/tasks/#{task.id}") Delete
+          form(method='post', action='/tasks/' + task.id)
+            input(name='_method', value='DELETE', type='hidden')
+            button(type='submit') Delete
