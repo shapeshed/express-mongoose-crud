@@ -1,15 +1,14 @@
-h1 Index
-ul
-  li
-    a(href='/tasks/new') New
+h1 Your Tasks
+p
+  a(href='/tasks/new', class='btn primary') Add a Task
 
 -if(typeof flash != 'undefined')
-  - if(flash.error)
-    div.alert-message.warning
+  - if(flash.warning)
+    div.alert-message.warning.fade.in
       a(class="close", href="#")×
       p= flash.warning
   - if(flash.info)
-    div.alert-message.success
+    div(data-alert='alert').alert-message.success.fade.in
       a(class="close", href="#")×
       p= flash.info
 
